@@ -19,6 +19,7 @@
 import { replacedUserPanelComponent } from "@plugins/philsPluginLibraryVisualRefresh/patches";
 import { Devs } from "@utils/constants";
 import definePlugin from "@utils/types";
+import { renderVoicePanelButtons } from '@plugins/philsPluginLibraryVisualRefresh';
 
 const plugin = definePlugin({
     name: "PhilsPluginLibraryVisualRefresh",
@@ -30,6 +31,13 @@ const plugin = definePlugin({
             replacement: {
                 match: /{}\)}\),/,
                 replace: "{})}),$self.replacedUserPanelComponent(),"
+            }
+        },
+        {
+            find: ".WIDGETS_RTC_UPSELL_COACHMARK),",
+            replacement: {
+                match: /speaking:.{0,100}style:.,children:\[/,
+                replace: "$&$self.renderVoicePanelButtons(arguments[0]),"
             }
         },
         {
@@ -46,7 +54,8 @@ const plugin = definePlugin({
             ]
         }
     ],
-    replacedUserPanelComponent
+    replacedUserPanelComponent,
+    renderVoicePanelButtons
 });
 
 
