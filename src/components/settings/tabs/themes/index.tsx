@@ -31,9 +31,7 @@ import { Forms, React, TabBar, useState } from "@webpack/common";
 import { CspErrorCard } from "./CspErrorCard";
 import { LocalThemesTab } from "./LocalThemesTab";
 import { OnlineThemesTab } from "./OnlineThemesTab";
-import { Margins } from "@utils/margins";
-import { on } from "events";
-import { Heading, HeadingPrimary } from "@components/Heading";
+import { HeadingPrimary } from "@components/Heading";
 import { Paragraph } from "@components/Paragraph";
 import { Flex } from "@components/Flex";
 
