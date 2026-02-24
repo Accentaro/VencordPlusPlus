@@ -157,8 +157,10 @@ function renderText(label: string, key: keyof typeof settings.store, placeholder
       <span style={{ fontSize: 13 }}>{label}</span>
       <input
         type="text"
+        //@ts-ignore
         placeholder={placeholder ?? settings.options[key]?.placeholder ?? ""}
         value={(settings.store[key] as any) ?? ""}
+        //@ts-ignore
         onChange={e => (settings.store[key] = (e.currentTarget.value as any))}
         style={{ padding: "6px 10px", borderRadius: 4, border: "1px solid var(--background-modifier-accent)", background: "var(--background-secondary)", color: "var(--text-normal)" }}
       />
@@ -404,6 +406,7 @@ async function handleKeybind(action: string) {
     switch(action) {
         case "skip": {
             if (settings.store.debugMode) {
+                //@ts-ignore
                 const { perfResult } = await pressOnce();
                 notify(`Pressed ✓ (in ${perfResult} ms)`, "success")
             }
