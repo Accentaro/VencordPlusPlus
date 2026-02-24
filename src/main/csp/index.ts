@@ -71,7 +71,8 @@ export const CspPolicies: PolicyMap = {
     "api.vmohammad.dev": ConnectSrc, // Custom API
     "ttsvibes.com": ConnectSrc, // TikTok TTS API
     "https://corsproxy.io": ConnectSrc, //Better audio display
-    "https://discord-themes.com": ImageAndCssSrc // Discord Themes CDN
+    "equicord.org": ImageAndCssSrc, // Equicord CDN
+    "themes.equicord.org": ImageAndCssSrc // Equicord Themes CDN
 };
 
 const findHeader = (headers: PolicyMap, headerName: Lowercase<string>) => {
