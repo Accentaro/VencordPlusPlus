@@ -33,5 +33,15 @@ export const settings = definePluginSettings({
         type: OptionType.BOOLEAN,
         description: "Send video state as false when fake deafened",
         default: false
+    },
+    debug: {
+        type: OptionType.BOOLEAN,
+        description: "Enable debug logging for Fake Deafen",
+        default: false,
+    },
+    copyErrorToClipboard: {
+        type: OptionType.BOOLEAN,
+        description: "Copy error to clipboard on error. This can be helpful for reporting issues in the VencordPlusPlus server, but may be annoying if you get a lot of errors that you don't care about, so it's off by default",
+        default: false,
     }
 });

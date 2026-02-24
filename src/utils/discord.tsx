@@ -124,6 +124,15 @@ export async function copyWithToast(text: string, toastMessage = "Copied to clip
     });
 }
 
+export async function copyErrorWithToast(error: Error | unknown, toastMessage = "Error copied to clipboard, please report in VencordPlusPlus server") {
+    await copyToClipboard(error instanceof Error ? error.stack ?? error.message : String(error));
+    Toasts.show({
+        message: toastMessage,
+        id: Toasts.genId(),
+        type: Toasts.Type.SUCCESS
+    });
+}
+
 export interface MessageOptions {
     messageReference: Message["messageReference"];
     allowedMentions: {
