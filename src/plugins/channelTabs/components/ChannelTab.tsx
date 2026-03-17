@@ -5,7 +5,7 @@
  */
 
 import { BaseText } from "@components/BaseText";
-import { ChannelTabsProps, closeTab, isTabSelected, moveDraggedTabs, moveToTab, openedTabs, settings } from "@plugins/channelTabs/util";
+import { ChannelTabsProps, closeTab, ensureUnreadFallbackCountsLoaded, getNotificationDotState, getUnreadFallbackCounts, isTabSelected, moveDraggedTabs, moveToTab, openedTabs, settings, updateUnreadFallbackCounts } from "@plugins/channelTabs/util";
 import { ActivityIcon, CircleQuestionIcon, DiscoveryIcon, EnvelopeIcon, FriendsIcon, ICYMIIcon, NitroIcon, QuestIcon, ShopIcon } from "@plugins/channelTabs/util/icons";
 import { activeQuestIntervals } from "@plugins/questify"; // sorry murphy!
 import { classNameFactory } from "@utils/css";
@@ -13,7 +13,7 @@ import { getGuildAcronym, getIntlMessage, getUniqueUsername } from "@utils/disco
 import { classes } from "@utils/misc";
 import { Channel, Guild, User } from "@vencord/discord-types";
 import { findComponentByCodeLazy, findCssClassesLazy } from "@webpack";
-import { Avatar, ChannelStore, ContextMenuApi, GuildStore, PresenceStore, ReadStateStore, TypingStore, useDrag, useDrop, useEffect, useRef, UserStore, useState, useStateFromStores } from "@webpack/common";
+import { Avatar, ChannelStore, ContextMenuApi, GuildStore, PresenceStore, ReadStateStore, ThemeStore, TypingStore, useDrag, useDrop, useEffect, useRef, UserStore, useState, useStateFromStores } from "@webpack/common";
 import { JSX } from "react";
 
 import { TabContextMenu } from "./ContextMenus";
@@ -76,26 +76,57 @@ function TypingIndicator({ isTyping }: { isTyping: boolean; }) {
 }
 
 export const NotificationDot = ({ channelIds }: { channelIds: string[]; }) => {
-    const [unreadCount, mentionCount] = useStateFromStores(
+    const userId = UserStore.getCurrentUser()?.id;
+    const { persistUnreadCountFallback } = settings.use(["persistUnreadCountFallback"]);
+    const [, forceUpdate] = useState(0);
+    const channelStateKey = channelIds.join(",");
+    const channelStates = useStateFromStores(
         [ReadStateStore],
-        () => [
-            channelIds.reduce((count, channelId) => count + ReadStateStore.getUnreadCount(channelId), 0),
-            channelIds.reduce((count, channelId) => count + ReadStateStore.getMentionCount(channelId), 0),
-        ]
+        () => channelIds.map(channelId => ({
+            channelId,
+            hasUnread: ReadStateStore.hasUnread(channelId),
+            mentionCount: ReadStateStore.getMentionCount(channelId),
+            unreadCount: ReadStateStore.getUnreadCount(channelId)
+        }))
+    );
+    const stateSignature = channelStates.map(state => `${state.channelId}:${Number(state.hasUnread)}:${state.mentionCount}:${state.unreadCount}`).join("|");
+    const { badgeText, hasMention, shouldShow } = getNotificationDotState(
+        channelStates,
+        userId ? getUnreadFallbackCounts(userId) : {},
+        persistUnreadCountFallback
     );
 
-    return unreadCount > 0 ?
+    useEffect(() => {
+        if (!userId || !persistUnreadCountFallback) return;
+
+        let didCancel = false;
+        ensureUnreadFallbackCountsLoaded(userId).then(() => {
+            if (didCancel) return;
+            forceUpdate(prev => prev + 1);
+        });
+
+        return () => {
+            didCancel = true;
+        };
+    }, [persistUnreadCountFallback, userId]);
+
+    useEffect(() => {
+        if (!userId || !persistUnreadCountFallback) return;
+        updateUnreadFallbackCounts(userId, channelStates);
+    }, [channelStateKey, persistUnreadCountFallback, stateSignature, userId]);
+
+    return shouldShow ?
         <div
-            data-has-mention={!!mentionCount}
+            data-has-mention={hasMention}
             className={classes(cl("notification-badge"), dotStyles.numberBadge, dotStyles.baseShapeRound)}
             style={{
                 width: "16px"
             }}
             ref={node => node?.style.setProperty("background-color",
-                mentionCount ? "var(--red-400)" : "var(--brand-500)", "important"
+                hasMention ? "var(--red-400)" : "var(--brand-500)", "important"
             )}
         >
-            {mentionCount || unreadCount}
+            {badgeText}
         </div> : null;
 };
 
@@ -428,19 +459,21 @@ export default function ChannelTab(props: ChannelTabsProps & { index: number; })
 
     // check if quests running (questify momentLet)
     const hasActiveQuests = activeQuestIntervals.size > 0;
-
+    console.log(ThemeStore.theme);
     return <div
-        className={cl("tab", {
-            "tab-compact": compact,
-            "tab-selected": isTabSelected(id),
-            "tab-entering": isEntering,
-            "tab-closing": isClosing,
-            "tab-dragging": isDragging,
-            "tab-drop-target": isDropTarget,
-            "tab-nitro": channelId === "__nitro__",
-            "tab-quests-active": channelId === "__quests__" && hasActiveQuests,
-            wider: settings.store.widerTabsAndBookmarks
-        })}
+        className={cl("tab",
+            ThemeStore.theme === "light" ? "light-theme" : "dark-theme",
+            {
+                "tab-compact": compact,
+                "tab-selected": isTabSelected(id),
+                "tab-entering": isEntering,
+                "tab-closing": isClosing,
+                "tab-dragging": isDragging,
+                "tab-drop-target": isDropTarget,
+                "tab-nitro": channelId === "__nitro__",
+                "tab-quests-active": channelId === "__quests__" && hasActiveQuests,
+                wider: settings.store.widerTabsAndBookmarks
+            })}
         key={index}
         ref={ref}
         onMouseEnter={() => setIsHovered(true)}
