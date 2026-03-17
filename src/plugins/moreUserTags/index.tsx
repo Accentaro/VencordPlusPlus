@@ -51,6 +51,14 @@ export default definePlugin({
                     predicate: () => settings.store.dontShowBotTag
                 },
             ],
+        },
+        {
+            find: '"#{intl::APP_TAG::hash}":',
+            predicate: () => settings.store.noAppsAllowed,
+            replacement: {
+                match: /(#{intl::APP_TAG::hash}":\[").*?("\])/,
+                replace: "$1BOT$2"
+            }
         }
     ],
     start() {
