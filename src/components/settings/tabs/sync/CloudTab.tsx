@@ -118,14 +118,15 @@ function CloudTab() {
                 Choose which cloud backend to use for storing your settings. You can switch between Vencord's cloud services, or use a self-hosted instance.
             </Paragraph>
 
-            <SearchableSelect
-                options={cloudBackendOptions}
-                value={cloudBackendOptions.find(o => o.value === cloud.url)}
-                onChange={v => changeUrl(v)}
-                className={Margins.bottom16}
-                closeOnSelect={true}
-                renderOptionPrefix={VencordIcon}
-            />
+            <div className={Margins.bottom8}>
+                <SearchableSelect
+                    options={cloudBackendOptions}
+                    value={cloudBackendOptions.find(o => o.value === cloud.url)?.value}
+                    onChange={v => changeUrl(v)}
+                    closeOnSelect={true}
+                    renderOptionPrefix={VencordIcon}
+                />
+            </div>
 
             <Flex gap="8px" alignItems="center">
                 <div style={{ flex: 1 }}>
@@ -242,17 +243,17 @@ function CloudTab() {
                     size="medium"
                     disabled={!isAuthenticated}
                     onClick={() => Alerts.show({
-                        title: "Erase All Cloud Data",
-                        body: "Are you sure you want to permanently delete all your cloud data? This action cannot be undone.",
+                        title: "Delete Cloud Account",
+                        body: "Are you sure you want to permanently delete your cloud account and all associated data? This action cannot be undone.",
                         onConfirm: eraseAllCloudData,
-                        confirmText: "Erase All Data",
+                        confirmText: "Delete Account",
                         confirmColor: "vc-cloud-erase-data-danger-btn",
                         cancelText: "Cancel"
                     })}
                 >
                     <Flex gap="8px" alignItems="center">
                         <SkullIcon color="currentColor" />
-                        Erase All Cloud Data
+                        Delete Cloud Account
                     </Flex>
                 </Button>
             </Flex>

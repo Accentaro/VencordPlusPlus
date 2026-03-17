@@ -291,7 +291,7 @@ export default function PluginModal({ plugin, onRestartNeeded, onClose, transiti
             {((tabsError && hasSettings) || (!tabsError && activeTab === "settings" && hasSettings)) && (
             <ModalFooter>
                 <Flex flexDirection="column" style={{ width: "100%" }}>
-                    <Flex style={{ justifyContent: "space-between" }}>
+                    <Flex style={{ justifyContent: "space-between", alignItems: "center" }}>
                         {hasSettings ? (
                             <Tooltip text="Reset to default settings" shouldShow={!isObjectEmpty(pluginSettings)}>
                                 {({ onMouseEnter, onMouseLeave }) => (
