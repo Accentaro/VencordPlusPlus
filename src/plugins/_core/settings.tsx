@@ -119,9 +119,6 @@ const settingsSectionMap: [string, string][] = [
     ["VencordCloud", "vencord_cloud_panel"],
     ["VencordBackupAndRestore", "vencord_backup_restore_panel"],
     ["VencordPatchHelper", "vencord_patch_helper_panel"],
-    ["VencordDiscordIcons", "vencord_icon_viewer"],
-    ["VencordThemeLibrary", "vencord_theme_library"],
-    ["VencordIRememberYou", "vencord_i_remember_you"],
 ];
 
 export default definePlugin({
@@ -166,13 +163,6 @@ export default definePlugin({
             replacement: {
                 match: /(\i)\.buildLayout\(\)(?=\.map)/,
                 replace: "$self.buildLayout($1)"
-            }
-        },
-        {
-            find: "getWebUserSettingFromSection",
-            replacement: {
-                match: /new Map\(\[(?=\[.{0,10}\.ACCOUNT,.{0,10}\.ACCOUNT_PANEL)/,
-                replace: "new Map([...$self.getSettingsSectionMappings(),"
             }
         }
     ],
