@@ -1192,7 +1192,6 @@ function getQuestAcceptedButtonProps(quest: Quest, text: string, disabled: boole
     };
 }
 
-
 export default definePlugin({
     name: "Questify",
     description: "Enhance your Quest experience with a suite of features, or disable them entirely if they're not your thing.",
@@ -1312,8 +1311,8 @@ export default definePlugin({
             // Allows in-progress Quests to still show.
             find: "QUESTS_BAR,questId",
             replacement: {
-                match: /(?=if\(null==(\i)\)return null;)(.{0,125}?quest:\i}\);return)/,
-                replace: "const hidePopup=$self.shouldHideQuestPopup($1);$2!hidePopup&&"
+                match: /(?<=function\(\){let (\i)=\(0,\i.\i\)\(\);)(return)/,
+                replace: "const hidePopup=$self.shouldHideQuestPopup($1);$2 hidePopup||"
             }
         },
         {
